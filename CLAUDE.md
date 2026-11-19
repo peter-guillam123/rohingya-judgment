@@ -9,12 +9,19 @@ Design: its own look - dark, quiet, typographic. No Guardian fonts, colours or l
 
 ## Rules for this project
 
-- The judgment PDF in this folder is the only source. Nothing goes in the
-  article that is not in it. The separate and dissenting opinions are not
-  in the file, so the article cannot say why any judge voted as they did.
-- Every factual claim carries the paragraph number it comes from. Run
+- Two PDFs in this folder are the only sources: the judgment
+  (`...-jud-01-00-en.pdf`) and the joint dissenting opinion of six judges
+  (`...-jud-01-03-en.pdf`), added on 19 November 2026 at Chris's request.
+  Nothing goes in the article that is not in one of them. The other 16
+  individual opinions and declarations are not sources; ask before adding
+  any. The ICJ site blocks automated downloads, so Chris saves the PDFs.
+- Every factual claim carries the paragraph number it comes from: "para
+  253" for the judgment, "dissent, para 12" for the dissent. Run
   `python3 tools/check_facts.py` after any copy change: it checks each
-  quoted phrase and figure against the judgment text.
+  quoted phrase and figure against the cited paragraphs.
+- Keep the two voices apart. What the court found is "the court". What
+  the minority said is "the six" or "the dissent", and stays in its own
+  section and in the one summary point at the top.
 - Graphic testimony stays behind a warned panel the reader chooses to
   open. The main read states findings plainly without the worst detail.
 - Coastlines and borders come from Natural Earth (public domain). Village

@@ -15,7 +15,7 @@ import os, re, sys
 from html.parser import HTMLParser
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from judgment import paragraphs, norm, numbers, ROOT
+from judgment import paragraphs, norm, numbers, have, ROOT
 from build_votes import clauses, JUDGES
 
 BLOCKS = {"p", "li", "dd", "dt", "td", "th", "caption", "footer", "summary", "time",
@@ -86,15 +86,18 @@ def parse_refs(node):
     out = set()
     for n in node.walk():
         if n.tag == "cite" and n.has_class("ref") and not n.has_class("ref--demo"):
-            t = n.text(skip_refs=False)
-            if not re.fullmatch(r"paras? [\d, –-]+", t.strip()):
+            t = n.text(skip_refs=False).strip()
+            # "para 253" cites the judgment; "dissent, para 12" cites the joint dissenting opinion
+            m = re.fullmatch(r"(?:(dissent), )?paras? ([\d, –-]+)", t)
+            if not m:
                 raise ValueError(f"cannot read citation: {t!r}")
-            for part in re.split(r",\s*", t.split(" ", 1)[1]):
-                m = re.fullmatch(r"(\d+)[–-](\d+)", part.strip())
-                if m:
-                    out.update(range(int(m.group(1)), int(m.group(2)) + 1))
+            src = m.group(1) or "judgment"
+            for part in re.split(r",\s*", m.group(2)):
+                r = re.fullmatch(r"(\d+)[–-](\d+)", part.strip())
+                if r:
+                    out.update((src, k) for k in range(int(r.group(1)), int(r.group(2)) + 1))
                 else:
-                    out.add(int(part))
+                    out.add((src, int(part)))
     return out
 
 
@@ -102,12 +105,19 @@ def refs_for(block):
     """A block's own citations; failing that, those of the nearest enclosing element that has any."""
     own = parse_refs(block)
     if "data-para" in block.attrs:  # 0 stands for the title pages, which have no paragraph number
-        own |= {int(x) for x in block.attrs["data-para"].split(",")}
+        own |= {("judgment", int(x)) for x in block.attrs["data-para"].split(",")}
+    # an enclosing element can add paragraphs that every block inside it also rests on
+    for a in block.ancestors():
+        if "data-para" in a.attrs:
+            extra = {("judgment", int(x)) for x in a.attrs["data-para"].split(",")}
+            if own:
+                return own | extra, False
+            break
     if own:
         return own, False
     for a in block.ancestors():
         if "data-para" in a.attrs:
-            return {int(x) for x in a.attrs["data-para"].split(",")}, True
+            return {("judgment", int(x)) for x in a.attrs["data-para"].split(",")}, True
         if a.tag == "blockquote":
             r = parse_refs(a)
             if not r and a.parent:
@@ -219,7 +229,11 @@ def check_votes(tree):
 
 def main():
     verbose = "-v" in sys.argv
-    paras = paragraphs()
+    paras = {("judgment", k): v for k, v in paragraphs().items()}
+    if have("dissent"):
+        d = paragraphs("dissent")
+        paras.update({("dissent", k): v for k, v in d.items()})
+        print(f"joint dissenting opinion: {len(d) - 1} paragraphs read")
     total_err = []
     for f in ["index.html", "about.html"]:
         p = os.path.join(ROOT, f)
