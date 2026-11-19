@@ -11,10 +11,10 @@ Design: its own look - dark, quiet, typographic. No Guardian fonts, colours or l
 
 - Two PDFs in this folder are the only sources: the judgment
   (`...-jud-01-00-en.pdf`) and the joint dissenting opinion of six judges
-  (`...-jud-01-03-en.pdf`), added on 19 November 2026 at Chris's request.
+  (`...-jud-01-03-en.pdf`), added on 19 November 2026 at the editor's request.
   Nothing goes in the article that is not in one of them. The other 16
   individual opinions and declarations are not sources; ask before adding
-  any. The ICJ site blocks automated downloads, so Chris saves the PDFs.
+  any. The ICJ site blocks automated downloads, so the editor saves the PDFs by hand.
 - Every factual claim carries the paragraph number it comes from: "para
   253" for the judgment, "dissent, para 12" for the dissent. Run
   `python3 tools/check_facts.py` after any copy change: it checks each
@@ -27,4 +27,7 @@ Design: its own look - dark, quiet, typographic. No Guardian fonts, colours or l
 - Coastlines and borders come from Natural Earth (public domain). Village
   positions are read off the court's sketch-map No. 1 and are approximate.
   Township lines are traced by eye from the same map. Say so on the page.
-- Not public. Ask before publishing anywhere.
+- Public since 19 November 2026, by the editor's decision: repo
+  `peter-guillam123/rohingya-judgment`, live on GitHub Pages, with a card
+  on the index site. Pushes to `main` deploy. The page keeps its
+  `noindex` tag until told otherwise. No lawyer has read it yet.
